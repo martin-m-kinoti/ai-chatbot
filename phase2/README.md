@@ -1,4 +1,4 @@
-# Raven Health AI — Phase 2: Full-Stack Chat Implementation
+# Phase 2: Full-Stack Chat Implementation
 
 Phase 2 builds a working end-to-end chatbot on top of the Phase 1 concept. It introduces a FastAPI backend that proxies requests to the OpenAI GPT-4o API and a React/Vite frontend that renders a real-time chat interface.
 
