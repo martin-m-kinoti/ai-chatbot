@@ -1,10 +1,6 @@
-AI-Powered Personal Diagnostic Assistant
+# System Design
 
----
-
-## Overview
-
-Raven is an NLP-driven medical chatbot designed to act as a personal health assistant. It allows users to describe symptoms through text or voice, submit images of visible symptoms, and receive structured health guidance — including possible conditions, recommended next steps, treatment information, and specialist referrals. The system is grounded in a curated medical knowledge base and uses retrieval-augmented generation (RAG) to ensure responses are accurate and contextually relevant.
+This phase covers what the Raven Health AI will entail, including its core features and architecture.
 
 ---
 
@@ -69,52 +65,5 @@ User Input (Text / Voice / Image)
  └─────────┬───────────┘
            │
            ▼
-      User Interface (React)
-```
-
----
-
-
-## Tech Stack
-
-| Component | Technology |
-|---|---|
-| LLM | GPT OpenAI API |
-| Backend | Python 3.11 + FastAPI |
-| Frontend | React |
-| Database | MongoDB |
-
----
-
-## Ethical and Legal Considerations
-
-- All responses include an automatic disclaimer that the bot is not a substitute for professional medical advice
-- No personally identifiable health data is stored in production without explicit user consent
-- The system is designed for informational and educational use only
-
----
-
-## Getting Started
-
-```bash
-# Clone the repository
-git clone <repo-url>
-cd ai-chatbot
-
-# Create and activate virtual environment
-python -m venv venv
-venv\Scripts\activate  # Windows
-
-# Install dependencies
-pip install -r requirements.txt
-
-# Configure environment variables
-cp .env.example .env
-# Add your API_KEY and other keys to .env
-
-# Run the backend
-uvicorn backend.main:app --reload
-
-# Run the frontend (separate terminal)
-npm run dev
+User Interface (React)
 ```
