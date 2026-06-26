@@ -6,6 +6,8 @@ export default defineConfig({
   server: {
     proxy: {
       '/chat': 'http://localhost:8000',
+      '/transcribe': 'http://localhost:8000',
+      '/speak': 'http://localhost:8000',
     },
   },
 })
