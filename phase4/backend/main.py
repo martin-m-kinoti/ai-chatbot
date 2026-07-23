@@ -11,7 +11,7 @@ app = FastAPI(title="Raven Health AI")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
+    allow_origins=["https://raven-health-ai.vercel.app/"],
     allow_methods=["*"],
     allow_headers=["*"],
 )
