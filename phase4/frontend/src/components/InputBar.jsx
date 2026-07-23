@@ -38,7 +38,7 @@ export default function InputBar({ onSend, disabled }) {
 
         setTranscribing(true)
         try {
-          const res = await fetch('/transcribe', { method: 'POST', body: formData })
+          const res = await fetch('https://backend-raven-health-ai.vercel.app/transcribe', { method: 'POST', body: formData })
           if (!res.ok) throw new Error('Transcription failed')
           const data = await res.json()
           if (data.text) setText(data.text)

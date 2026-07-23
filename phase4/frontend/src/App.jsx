@@ -22,7 +22,7 @@ export default function App() {
     setLoading(true)
 
     try {
-      const res = await fetch('/chat', {
+      const res = await fetch('https://backend-raven-health-ai.vercel.app/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ message: text, history: messages }),
@@ -55,7 +55,7 @@ export default function App() {
     formData.append('history', JSON.stringify(messages))
 
     try {
-      const res = await fetch('/chat/image', { method: 'POST', body: formData })
+      const res = await fetch('https://backend-raven-health-ai.vercel.app//chat/image', { method: 'POST', body: formData })
       if (!res.ok) throw new Error('Server error')
 
       const data = await res.json()
