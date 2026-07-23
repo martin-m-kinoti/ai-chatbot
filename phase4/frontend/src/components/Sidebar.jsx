@@ -2,7 +2,7 @@ export default function Sidebar({ speechEnabled, onSpeechChange }) {
   return (
     <aside className="sidebar">
       <div className="sidebar-header">
-          <img src="./public/logo.png" alt="logo" className="logo"/>
+          <img src="/logo.png" alt="logo" className="logo"/>
           <h3>Raven Health AI</h3>
       </div>
 
