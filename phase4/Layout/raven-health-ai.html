@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Raven Health AI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,450;0,9..144,600;1,9..144,450&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg-0: #060a08;
+    --bg-1: #0b1310;
+    --bg-2: #101a16;
+    --line: #1c2b24;
+    --line-soft: #16211c;
+    --ink: #e7ede8;
+    --ink-dim: #8fa397;
+    --ink-faint: #566860;
+    --teal: #4de8c4;
+    --teal-dim: #2a7a67;
+    --amber: #f0b35e;
+    --amber-dim: #8a6430;
+    --danger: #e8735a;
+    --radius: 14px;
+    --serif: 'Fraunces', Georgia, serif;
+    --mono: 'IBM Plex Mono', ui-monospace, monospace;
+  }
+
+  *{ box-sizing: border-box; }
+
+  html, body{
+    height: 100%;
+    margin: 0;
+  }
+
+  body{
+    background: var(--bg-0);
+    color: var(--ink);
+    font-family: var(--mono);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* atmosphere */
+  body::before{
+    content: "";
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 900px 500px at 12% -8%, rgba(77,232,196,0.10), transparent 60%),
+      radial-gradient(ellipse 700px 600px at 108% 25%, rgba(240,179,94,0.07), transparent 55%),
+      radial-gradient(ellipse 1000px 800px at 50% 120%, rgba(77,232,196,0.05), transparent 60%);
+    pointer-events: none;
+    z-index: 0;
+  }
+  body::after{
+    content:"";
+    position: fixed;
+    inset: 0;
+    opacity: 0.035;
+    pointer-events: none;
+    z-index: 0;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  .app-layout{
+    position: relative;
+    z-index: 1;
+    display: flex;
+    height: 100vh;
+  }
+
+  /* ---------- Sidebar ---------- */
+  .sidebar{
+    width: 300px;
+    min-width: 300px;
+    background: linear-gradient(180deg, var(--bg-1), var(--bg-0));
+    border-right: 1px solid var(--line);
+    padding: 2rem 1.6rem;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .brand{
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    margin-bottom: 2.6rem;
+  }
+
+  .brand-mark{
+    width: 34px;
+    height: 34px;
+    flex-shrink: 0;
+    filter: drop-shadow(0 0 6px rgba(77,232,196,0.45));
+  }
+
+  .brand-text h3{
+    margin: 0;
+    font-family: var(--serif);
+    font-weight: 600;
+    font-size: 1.15rem;
+    letter-spacing: 0.01em;
+    color: var(--ink);
+  }
+  .brand-text span{
+    display: block;
+    font-size: 0.62rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--teal-dim);
+    margin-top: 2px;
+  }
+
+  .sidebar-section{
+    margin-bottom: 2.2rem;
+    padding-bottom: 2.2rem;
+    border-bottom: 1px solid var(--line-soft);
+  }
+  .sidebar-section:last-of-type{
+    border-bottom: none;
+  }
+
+  .section-title{
+    font-size: 0.68rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--ink-faint);
+    margin: 0 0 1rem 0;
+  }
+
+  .preference-item{
+    display: flex;
+    align-items: flex-start;
+    gap: 0.85rem;
+    cursor: pointer;
+    padding: 0.85rem 0.7rem;
+    border-radius: 10px;
+    transition: background 0.25s ease, border-color 0.25s ease;
+    margin-bottom: 0.4rem;
+    border: 1px solid transparent;
+  }
+  .preference-item:hover{
+    background: rgba(77,232,196,0.05);
+    border-color: var(--line);
+  }
+
+  /* custom checkbox */
+  .preference-input{
+    appearance: none;
+    -webkit-appearance: none;
+    width: 18px;
+    height: 18px;
+    margin-top: 2px;
+    border-radius: 5px;
+    border: 1.5px solid var(--ink-faint);
+    background: var(--bg-2);
+    cursor: pointer;
+    flex-shrink: 0;
+    position: relative;
+    transition: all 0.2s ease;
+  }
+  .preference-input:hover{ border-color: var(--teal); }
+  .preference-input:checked{
+    background: var(--teal);
+    border-color: var(--teal);
+    box-shadow: 0 0 12px rgba(77,232,196,0.5);
+  }
+  .preference-input:checked::after{
+    content: "";
+    position: absolute;
+    left: 5px;
+    top: 1px;
+    width: 5px;
+    height: 9px;
+    border: solid #06120d;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+  }
+
+  .preference-body{ flex: 1; }
+
+  .preference-label{
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    font-weight: 500;
+    font-size: 0.88rem;
+    color: var(--ink);
+    user-select: none;
+  }
+
+  .preference-icon{ font-size: 1rem; line-height: 1; }
+
+  .preference-description{
+    font-size: 0.74rem;
+    color: var(--ink-faint);
+    margin: 0.4rem 0 0 0;
+    line-height: 1.5;
+  }
+
+  .disclaimer-box{
+    margin-top: auto;
+    padding: 1rem;
+    border-radius: 10px;
+    background: rgba(240,179,94,0.05);
+    border: 1px solid rgba(240,179,94,0.18);
+    font-size: 0.7rem;
+    line-height: 1.55;
+    color: var(--amber);
+  }
+  .disclaimer-box b{ color: var(--amber); }
+
+  /* ---------- Main ---------- */
+  .main-content{
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    min-width: 0;
+  }
+
+  .app-header{
+    padding: 1.7rem 2.4rem;
+    border-bottom: 1px solid var(--line);
+    background: rgba(11,19,16,0.6);
+    backdrop-filter: blur(8px);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .app-header h1{
+    margin: 0;
+    font-family: var(--serif);
+    font-weight: 450;
+    font-style: italic;
+    font-size: 1.85rem;
+    letter-spacing: 0.005em;
+    color: var(--ink);
+  }
+  .app-header h1 em{
+    font-style: italic;
+    color: var(--teal);
+  }
+
+  .status-pill{
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.68rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-dim);
+    border: 1px solid var(--line);
+    padding: 0.45rem 0.9rem;
+    border-radius: 100px;
+  }
+  .status-dot{
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--teal);
+    box-shadow: 0 0 8px var(--teal);
+    animation: pulse 2.4s ease-in-out infinite;
+  }
+  @keyframes pulse{
+    0%,100%{ opacity: 1; transform: scale(1); }
+    50%{ opacity: 0.5; transform: scale(0.8); }
+  }
+
+  .chat-window{
+    flex: 1;
+    overflow-y: auto;
+    padding: 2.4rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.6rem;
+  }
+
+  .msg{
+    display: flex;
+    gap: 0.9rem;
+    max-width: 680px;
+    animation: rise 0.5s ease both;
+  }
+  @keyframes rise{
+    from{ opacity: 0; transform: translateY(10px); }
+    to{ opacity: 1; transform: translateY(0); }
+  }
+
+  .msg.user{
+    align-self: flex-end;
+    flex-direction: row-reverse;
+  }
+
+  .avatar{
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg-2);
+    border: 1px solid var(--line);
+  }
+  .avatar.raven svg{ width: 19px; height: 19px; filter: drop-shadow(0 0 5px rgba(77,232,196,0.5)); }
+  .avatar.user-av{
+    background: linear-gradient(135deg, var(--amber-dim), var(--amber));
+    color: #1a1206;
+    font-family: var(--serif);
+    font-weight: 600;
+    font-size: 0.85rem;
+  }
+
+  .msg-body{ min-width: 0; }
+
+  .msg-sender{
+    font-size: 0.66rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    margin-bottom: 0.45rem;
+  }
+  .msg.user .msg-sender{ text-align: right; }
+
+  .msg-bubble{
+    font-family: var(--serif);
+    font-size: 1rem;
+    line-height: 1.65;
+    color: var(--ink);
+    background: var(--bg-2);
+    border: 1px solid var(--line);
+    padding: 0.95rem 1.2rem;
+    border-radius: var(--radius);
+    border-top-left-radius: 4px;
+  }
+  .msg.user .msg-bubble{
+    background: rgba(240,179,94,0.06);
+    border-color: rgba(240,179,94,0.22);
+    border-top-left-radius: var(--radius);
+    border-top-right-radius: 4px;
+  }
+
+  .speaker-btn{
+    margin-top: 0.6rem;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    border: 1px solid var(--line);
+    background: var(--bg-1);
+    color: var(--ink-dim);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+  }
+  .speaker-btn:hover{
+    color: var(--teal);
+    border-color: var(--teal-dim);
+  }
+  .speaker-btn svg{ width: 13px; height: 13px; }
+
+  .typing{
+    display: flex;
+    gap: 4px;
+    padding: 0.3rem 0.2rem;
+  }
+  .typing span{
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--teal-dim);
+    animation: bounce 1.2s infinite ease-in-out;
+  }
+  .typing span:nth-child(2){ animation-delay: 0.15s; }
+  .typing span:nth-child(3){ animation-delay: 0.3s; }
+  @keyframes bounce{
+    0%,60%,100%{ transform: translateY(0); opacity: 0.4; }
+    30%{ transform: translateY(-5px); opacity: 1; }
+  }
+
+  /* ---------- Input bar ---------- */
+  .input-bar{
+    padding: 1.4rem 2.4rem 1.8rem;
+    border-top: 1px solid var(--line);
+    background: var(--bg-1);
+  }
+
+  .input-shell{
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    background: var(--bg-2);
+    border: 1px solid var(--line);
+    border-radius: 100px;
+    padding: 0.4rem 0.5rem 0.4rem 1.3rem;
+    max-width: 780px;
+    margin: 0 auto;
+    transition: border-color 0.25s ease, box-shadow 0.25s ease;
+  }
+  .input-shell:focus-within{
+    border-color: var(--teal-dim);
+    box-shadow: 0 0 0 3px rgba(77,232,196,0.08);
+  }
+
+  .symptom-input{
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: var(--ink);
+    font-family: var(--serif);
+    font-size: 0.98rem;
+    padding: 0.6rem 0;
+  }
+  .symptom-input::placeholder{ color: var(--ink-faint); }
+
+  .icon-btn{
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    border: 1px solid var(--line);
+    background: var(--bg-1);
+    color: var(--ink-dim);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: all 0.2s ease;
+  }
+  .icon-btn:hover{ border-color: var(--teal-dim); color: var(--teal); }
+  .icon-btn svg{ width: 16px; height: 16px; }
+
+  .send-btn{
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    border: none;
+    background: var(--teal);
+    color: #06120d;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+    box-shadow: 0 0 14px rgba(77,232,196,0.35);
+  }
+  .send-btn:hover{ transform: scale(1.06); }
+  .send-btn:active{ transform: scale(0.94); }
+  .send-btn:disabled{
+    opacity: 0.35;
+    box-shadow: none;
+    cursor: not-allowed;
+    transform: none;
+  }
+  .send-btn svg{ width: 16px; height: 16px; }
+
+  .input-footnote{
+    text-align: center;
+    font-size: 0.65rem;
+    color: var(--ink-faint);
+    margin-top: 0.9rem;
+    letter-spacing: 0.03em;
+  }
+
+  /* scrollbars */
+  .sidebar::-webkit-scrollbar, .chat-window::-webkit-scrollbar{ width: 6px; }
+  .sidebar::-webkit-scrollbar-track, .chat-window::-webkit-scrollbar-track{ background: transparent; }
+  .sidebar::-webkit-scrollbar-thumb, .chat-window::-webkit-scrollbar-thumb{
+    background: var(--line);
+    border-radius: 3px;
+  }
+  .sidebar::-webkit-scrollbar-thumb:hover, .chat-window::-webkit-scrollbar-thumb:hover{
+    background: var(--teal-dim);
+  }
+</style>
+</head>
+<body>
+
+<div class="app-layout">
+
+  <aside class="sidebar">
+    <div class="brand">
+      <svg class="brand-mark" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M20 3C11 3 4 10 4 19c0 6 3.5 10.5 7.5 13-1 2-2.5 3.5-4.5 4.5 3.5 1 7-.5 9-3 1.3.4 2.7.6 4 .6s2.7-.2 4-.6c2 2.5 5.5 4 9 3-2-1-3.5-2.5-4.5-4.5 4-2.5 7.5-7 7.5-13C36 10 29 3 20 3Z" stroke="#4de8c4" stroke-width="1.4"/>
+        <circle cx="15.5" cy="17.5" r="1.6" fill="#4de8c4"/>
+        <circle cx="24.5" cy="17.5" r="1.6" fill="#4de8c4"/>
+      </svg>
+      <div class="brand-text">
+        <h3>Raven Health</h3>
+        <span>AI Symptom Companion</span>
+      </div>
+    </div>
+
+    <div class="sidebar-section">
+      <p class="section-title">Audio</p>
+      <label class="preference-item">
+        <input type="checkbox" class="preference-input" id="speechToggle">
+        <div class="preference-body">
+          <span class="preference-label">
+            <span class="preference-icon">🔊</span>
+            Speech Responses
+          </span>
+          <p class="preference-description">Automatically play audio for all responses.</p>
+        </div>
+      </label>
+    </div>
+
+    <div class="sidebar-section">
+      <p class="section-title">Conversation</p>
+      <label class="preference-item">
+        <input type="checkbox" class="preference-input" checked>
+        <div class="preference-body">
+          <span class="preference-label">
+            <span class="preference-icon">📋</span>
+            Follow-up questions
+          </span>
+          <p class="preference-description">Let Raven ask clarifying questions before responding.</p>
+        </div>
+      </label>
+      <label class="preference-item">
+        <input type="checkbox" class="preference-input">
+        <div class="preference-body">
+          <span class="preference-label">
+            <span class="preference-icon">🗂️</span>
+            Save session history
+          </span>
+          <p class="preference-description">Keep this conversation for your next visit.</p>
+        </div>
+      </label>
+    </div>
+
+    <div class="disclaimer-box">
+      <b>Not a diagnosis.</b> Raven offers general information only and cannot replace a licensed clinician. In an emergency, contact local emergency services immediately.
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <header class="app-header">
+      <h1>Raven <em>Health</em> AI</h1>
+      <div class="status-pill"><span class="status-dot"></span> Listening</div>
+    </header>
+
+    <div class="chat-window" id="chatWindow">
+      <div class="msg raven">
+        <div class="avatar raven">
+          <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M20 3C11 3 4 10 4 19c0 6 3.5 10.5 7.5 13-1 2-2.5 3.5-4.5 4.5 3.5 1 7-.5 9-3 1.3.4 2.7.6 4 .6s2.7-.2 4-.6c2 2.5 5.5 4 9 3-2-1-3.5-2.5-4.5-4.5 4-2.5 7.5-7 7.5-13C36 10 29 3 20 3Z" stroke="#4de8c4" stroke-width="1.4"/>
+            <circle cx="15.5" cy="17.5" r="1.6" fill="#4de8c4"/>
+            <circle cx="24.5" cy="17.5" r="1.6" fill="#4de8c4"/>
+          </svg>
+        </div>
+        <div class="msg-body">
+          <p class="msg-sender">Raven</p>
+          <div class="msg-bubble">
+            Hi, I'm Raven — your personal health assistant. Describe your symptoms and I'll help you understand what might be going on. Remember, I'm not a substitute for professional medical advice.
+          </div>
+          <button class="speaker-btn" title="Play audio">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 5 6 9H2v6h4l5 4V5Z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="input-bar">
+      <div class="input-shell">
+        <input type="text" class="symptom-input" id="symptomInput" placeholder="Describe your symptoms…">
+        <button class="icon-btn" id="micBtn" title="Voice input">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/></svg>
+        </button>
+        <button class="send-btn" id="sendBtn" title="Send">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        </button>
+      </div>
+      <p class="input-footnote">Raven can make mistakes. For emergencies, call your local emergency number.</p>
+    </div>
+  </main>
+
+</div>
+
+<script>
+  const chatWindow = document.getElementById('chatWindow');
+  const input = document.getElementById('symptomInput');
+  const sendBtn = document.getElementById('sendBtn');
+
+  const ravenAvatar = `<svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M20 3C11 3 4 10 4 19c0 6 3.5 10.5 7.5 13-1 2-2.5 3.5-4.5 4.5 3.5 1 7-.5 9-3 1.3.4 2.7.6 4 .6s2.7-.2 4-.6c2 2.5 5.5 4 9 3-2-1-3.5-2.5-4.5-4.5 4-2.5 7.5-7 7.5-13C36 10 29 3 20 3Z" stroke="#4de8c4" stroke-width="1.4"/>
+    <circle cx="15.5" cy="17.5" r="1.6" fill="#4de8c4"/>
+    <circle cx="24.5" cy="17.5" r="1.6" fill="#4de8c4"/>
+  </svg>`;
+
+  const speakerIcon = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 5 6 9H2v6h4l5 4V5Z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/></svg>`;
+
+  const sampleReplies = [
+    "Thanks for sharing that. How long have you been experiencing this, and would you say it's mild, moderate, or severe?",
+    "Got it. Has anything made it better or worse — rest, movement, food, or medication?",
+    "That's helpful context. Are there any other symptoms alongside this, like fever, fatigue, or changes in appetite?",
+    "Noted. Based on what you've described, this could have a few common explanations, but I'd recommend checking in with a clinician if it persists or worsens."
+  ];
+  let replyIndex = 0;
+
+  function scrollToBottom(){
+    chatWindow.scrollTop = chatWindow.scrollHeight;
+  }
+
+  function addMessage(text, sender){
+    const wrap = document.createElement('div');
+    wrap.className = 'msg ' + (sender === 'user' ? 'user' : 'raven');
+
+    const avatar = document.createElement('div');
+    avatar.className = 'avatar ' + (sender === 'user' ? 'user-av' : 'raven');
+    avatar.innerHTML = sender === 'user' ? 'You' : ravenAvatar;
+
+    const body = document.createElement('div');
+    body.className = 'msg-body';
+
+    const label = document.createElement('p');
+    label.className = 'msg-sender';
+    label.textContent = sender === 'user' ? 'You' : 'Raven';
+
+    const bubble = document.createElement('div');
+    bubble.className = 'msg-bubble';
+    bubble.textContent = text;
+
+    body.appendChild(label);
+    body.appendChild(bubble);
+
+    if(sender !== 'user'){
+      const speakerBtn = document.createElement('button');
+      speakerBtn.className = 'speaker-btn';
+      speakerBtn.title = 'Play audio';
+      speakerBtn.innerHTML = speakerIcon;
+      body.appendChild(speakerBtn);
+    }
+
+    wrap.appendChild(avatar);
+    wrap.appendChild(body);
+    chatWindow.appendChild(wrap);
+    scrollToBottom();
+  }
+
+  function showTyping(){
+    const wrap = document.createElement('div');
+    wrap.className = 'msg raven';
+    wrap.id = 'typingMsg';
+
+    const avatar = document.createElement('div');
+    avatar.className = 'avatar raven';
+    avatar.innerHTML = ravenAvatar;
+
+    const body = document.createElement('div');
+    body.className = 'msg-body';
+    body.innerHTML = `<p class="msg-sender">Raven</p>
+      <div class="msg-bubble"><div class="typing"><span></span><span></span><span></span></div></div>`;
+
+    wrap.appendChild(avatar);
+    wrap.appendChild(body);
+    chatWindow.appendChild(wrap);
+    scrollToBottom();
+  }
+
+  function removeTyping(){
+    const t = document.getElementById('typingMsg');
+    if(t) t.remove();
+  }
+
+  function handleSend(){
+    const value = input.value.trim();
+    if(!value) return;
+    addMessage(value, 'user');
+    input.value = '';
+    showTyping();
+    setTimeout(() => {
+      removeTyping();
+      const reply = sampleReplies[replyIndex % sampleReplies.length];
+      replyIndex++;
+      addMessage(reply, 'raven');
+    }, 1100 + Math.random() * 500);
+  }
+
+  sendBtn.addEventListener('click', handleSend);
+  input.addEventListener('keydown', (e) => {
+    if(e.key === 'Enter') handleSend();
+  });
+
+  document.getElementById('micBtn').addEventListener('click', () => {
+    input.placeholder = 'Listening…';
+    input.focus();
+    setTimeout(() => { input.placeholder = 'Describe your symptoms…'; }, 1800);
+  });
+</script>
+
+</body>
+</html>
